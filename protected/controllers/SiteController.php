@@ -249,8 +249,24 @@ class SiteController extends Controller
 
         if(!isset($_GET['site_id'])){$site_id = 1;}else{$site_id = $_GET['site_id'];}
 
+        //если указана метка рекламы - формируем запрос с учётом номеров для рекламы
+        if(isset($_GET['utm_source']))
+        {
+            //метка для гугл-рекламы
+            if($_GET['utm_source']=='google')
+            {
+                $select = 'SELECT (IF(LENGTH( tbl_city_site_phone.google_phone) > 0, tbl_city_site_phone.google_phone, tbl_city_site_phone.phone))as phone, tbl_city.city AS city';
+
+            }elseif($_GET['utm_source']=='direct')
+            {
+                $select = 'SELECT (IF(LENGTH( tbl_city_site_phone.direct_phone) > 0, tbl_city_site_phone.direct_phone, tbl_city_site_phone.phone))as phone, tbl_city.city AS city';
+            }
+        }else{
+            $select = 'SELECT tbl_city_site_phone.phone, tbl_city.city AS city';
+        }
+
         //получаем список активных регионов для списка
-        $sql = 'SELECT tbl_city_site_phone.phone, tbl_city.city AS city
+        $sql = $select.'
                 FROM tbl_city_site_phone
                 LEFT JOIN tbl_city ON tbl_city_site_phone.city_id = tbl_city.id
                 WHERE tbl_city_site_phone.site_id=:site_id AND tbl_city_site_phone.active =:active AND main_city =:main_city
@@ -332,14 +348,18 @@ class SiteController extends Controller
 
 
         if($models){
+
             $json = array();
+
+            $city = '';
+
             foreach($models as $model){
                 //$json[] = array('phone'=>$model->phone, 'city'=>$model->city->city, 'site'=>$model->site->site);
                //если город основной тогда выводим его название, если нет тогда выводим название рег. центра
                if($model->city->main_city==1){
-                    $json[] = array('phone'=>$model->phone, 'city'=>$model->city->city, 'site'=>$model->site->site);
+                   $json[] = array('phone'=>$model->phone, 'city'=>$model->city->city, 'site'=>$model->site->site, 'direct_phone'=>$model->direct_phone, 'google_phone'=>$model->google_phone);
                 }else{
-                    $json[] = array('phone'=>$model->phone, 'city'=>$model->city->region->city, 'site'=>$model->site->site);
+                   $json[] = array('phone'=>$model->phone, 'city'=>$model->city->region->city, 'site'=>$model->site->site, 'direct_phone'=>$model->direct_phone, 'google_phone'=>$model->google_phone);
                 }
             }
 

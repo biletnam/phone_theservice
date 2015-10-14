@@ -38,6 +38,10 @@
     <?php echo $form->labelEx($model,'site_id'); ?>
     <?php echo $form->dropDownList($model,'site_id',CHtml::listData(Site::model()->findAll(), 'id', 'site'),array('span'=>5)); ?>
 
+    <?php echo $form->textFieldControlGroup($model,'direct_phone',array('span'=>5)); ?>
+
+    <?php echo $form->textFieldControlGroup($model,'google_phone',array('span'=>5)); ?>
+
     <div class="form-actions">
         <?php
         echo TbHtml::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить',array(

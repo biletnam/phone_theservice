@@ -40,11 +40,13 @@ class CitySitePhone extends CActiveRecord
 			array('city_id, site_id, phone, active, relation_tpl', 'required'),
 
 			array('city_id, site_id, active, relation_tpl', 'numerical', 'integerOnly'=>true),
-			array('phone', 'length', 'max'=>60),
+
+			array('phone, direct_phone, google_phone', 'length', 'max'=>60),
 
 
             array('city_id', 'uniqueCity'),
-            array('phone', 'validatePhone'),
+
+            array('phone, direct_phone, google_phone', 'validatePhone'),
 
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -72,11 +74,14 @@ class CitySitePhone extends CActiveRecord
     /*
      * валидация номера телефона
      */
-    public function validatePhone(){
+    public function validatePhone($attribute,$params){
         if(!$this->hasErrors()){
-            //формат номера может быть - 8 (4822) 63-32-71  или 8 (482) 263-32-71
-            if(!preg_match('/8 \(([1-9]{3,4})\) \d{2,3}-\d{2}-\d{2}/i', $this->phone)){
-                $this->addError('phone', 'Номер телефона указан не верно, необходимо указать в правильном формате:8 (xxxx) xx-xx-xx  или 8 (xxx) xxx-xx-xx');
+            if($this->$attribute)
+            {
+                //формат номера может быть - 8 (4822) 63-32-71  или 8 (482) 263-32-71
+                if(!preg_match('/8 \(([0-9]{3,4})\) \d{2,3}-\d{2}-\d{2}/i', $this->$attribute)){
+                    $this->addError($attribute, 'Номер телефона указан не верно, необходимо указать в правильном формате:8 (xxxx) xx-xx-xx  или 8 (xxx) xxx-xx-xx');
+                }
             }
         }
     }
@@ -137,6 +142,8 @@ class CitySitePhone extends CActiveRecord
 			'relation_tpl' => 'Привязка к шаблону',
             'main_city'=>'Областной центр',
             'region_phone'=>'Регион. телефон',
+            'direct_phone'=>'Телефон(я-директ)',
+            'google_phone'=>'Телефон(гугл-адводс)',
 		);
 	}
 

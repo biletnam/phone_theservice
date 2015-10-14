@@ -1,0 +1,7 @@
+AuthType Basic
+AuthName "/www/phone.theservice.ru/webstat"
+AuthUserFile /var/www/theservice/data/etc/13371218.passwd
+DirectoryIndex index.html
+<Limit GET POST>
+	require valid-user
+</Limit>
